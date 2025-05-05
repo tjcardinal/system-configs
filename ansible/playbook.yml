@@ -1,0 +1,47 @@
+- name: Configure dotfiles and install software
+  hosts: local
+  tasks:
+
+  - name: Install software
+    become: yes
+    ansible.builtin.apt:
+      update_cache: yes
+      name:
+        - bat
+        - fd-find
+        - fish
+        - fzf
+        - git
+        - htop
+        - neovim
+        - ripgrep
+        #- starship
+        - tealdeer
+        - tmux
+        - zoxide
+
+  - name: Symlink dotfiles
+    ansible.builtin.file: 
+      src: ~/dotfiles/home/{{ item }}
+      dest: ~/{{ item }}
+      state: link
+      force: yes
+    with_fileglob: '.*'
+  
+  - name: Ensure ~/.config exists
+    ansible.builtin.file:
+      path: ~/.config
+      state: directory
+
+  - name: Symlink fish config
+    ansible.builtin.file:
+      src: ~/dotfiles/home/fish_config
+      dest: ~/.config/fish
+      state: link
+      force: yes
+
+  - name: Add fish to .bashrc
+    ansible.builtin.lineinfile:
+      path: ~/.bashrc
+      state: present
+      line: 'exec fish'
