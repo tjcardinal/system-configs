@@ -24,11 +24,11 @@
   tasks:
   - name: Symlink dotfiles
     ansible.builtin.file: 
-      src: ~/dotfiles/home/{{ item }}
-      dest: ~/{{ item }}
+      src: "{{ playbook_dir }}/home/{{ item | basename }}"
+      dest: ~/{{ item | basename}}
       state: link
       force: yes
-    with_fileglob: '.*'
+    with_fileglob: "{{ playbook_dir }}/home/.*"
   
   - name: Ensure ~/.config exists
     ansible.builtin.file:
@@ -37,14 +37,14 @@
 
   - name: Symlink neovim config
     ansible.builtin.file:
-      src: ~/dotfiles/home/nvim_config
+      src: "{{ playbook_dir }}/home/nvim_config"
       dest: ~/.config/nvim
       state: link
       force: yes
 
   - name: Symlink fish config
     ansible.builtin.file:
-      src: ~/dotfiles/home/fish_config
+      src: "{{ playbook_dir }}/home/fish_config"
       dest: ~/.config/fish
       state: link
       force: yes
@@ -53,4 +53,4 @@
     ansible.builtin.lineinfile:
       path: ~/.bashrc
       state: present
-      line: 'exec fish'
+      line: "exec fish"
