@@ -1,7 +1,6 @@
-- name: Configure dotfiles and install software
+- name: Install software
   hosts: local
   tasks:
-
   - name: Install software
     become: yes
     ansible.builtin.apt:
@@ -20,6 +19,9 @@
         - tmux
         - zoxide
 
+- name: Configure dotfiles
+  hosts: local
+  tasks:
   - name: Symlink dotfiles
     ansible.builtin.file: 
       src: ~/dotfiles/home/{{ item }}
@@ -32,6 +34,13 @@
     ansible.builtin.file:
       path: ~/.config
       state: directory
+
+  - name: Symlink neovim config
+    ansible.builtin.file:
+      src: ~/dotfiles/home/nvim_config
+      dest: ~/.config/nvim
+      state: link
+      force: yes
 
   - name: Symlink fish config
     ansible.builtin.file:
