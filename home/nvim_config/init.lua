@@ -233,22 +233,22 @@ later(function()
 	end, { desc = "[S]earch [W]ord" })
 end)
 
-later(function()
-	add("stevearc/conform.nvim")
-	require("conform").setup({
-		formatters_by_ft = {
-			c = { "clang-format" },
-			cpp = { "clang-format" },
-			lua = { "stylua" },
-			nix = { "nixfmt" },
-			python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
-			rust = { "rustfmt" },
-		},
-		format_on_save = {
-			lsp_format = "fallback",
-		},
-	})
-end)
+-- later(function()
+-- 	add("stevearc/conform.nvim")
+-- 	require("conform").setup({
+-- 		formatters_by_ft = {
+-- 			c = { "clang-format" },
+-- 			cpp = { "clang-format" },
+-- 			lua = { "stylua" },
+-- 			nix = { "nixfmt" },
+-- 			python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
+-- 			rust = { "rustfmt" },
+-- 		},
+-- 		format_on_save = {
+-- 			lsp_format = "fallback",
+-- 		},
+-- 	})
+-- end)
 
 later(function()
 	add("mfussenegger/nvim-lint")
@@ -270,10 +270,10 @@ end)
 
 -- NOTE: Load right away so that lsp client can attach when starting nvim with a file
 now(function()
-	add("folke/lazydev.nvim")
-	require("lazydev").setup({
-		library = { "${3rd}/luv/library" },
-	})
+	-- add("folke/lazydev.nvim")
+	-- require("lazydev").setup({
+	-- 	library = { "${3rd}/luv/library" },
+	-- })
 
 	add("neovim/nvim-lspconfig")
 	require("lspconfig").rust_analyzer.setup({})
