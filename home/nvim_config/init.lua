@@ -1,112 +1,100 @@
---
--- Leader keys
--- NOTE: Leader keys must be set before plugins (otherwise wrong Leader will be used)
---
+---
+--- Leader keys
+---
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
---
--- Install mini.nvim
--- NOTE: If using nix, it will already be installed
---
-local path_package = nil
-if not vim.g.is_nix then
-	-- Clone 'mini.nvim' manually in a way that it gets managed by 'mini.deps'
-	path_package = vim.fn.stdpath("data") .. "/site/"
-	local mini_path = path_package .. "pack/deps/start/mini.nvim"
-	if not vim.loop.fs_stat(mini_path) then
-		vim.cmd('echo "Installing `mini.nvim`" | redraw')
-		local clone_cmd = {
-			"git",
-			"clone",
-			"--filter=blob:none",
-			"https://github.com/echasnovski/mini.nvim",
-			mini_path,
-		}
-		vim.fn.system(clone_cmd)
-		vim.cmd("packadd mini.nvim | helptags ALL")
-		vim.cmd('echo "Installed `mini.nvim`" | redraw')
-	end
+---
+--- Bootstrap mini.nvim
+---
+local path_package = vim.fn.stdpath("data") .. "/site"
+local mini_path = path_package .. "/pack/deps/start/mini.nvim"
+if not vim.loop.fs_stat(mini_path) then
+	vim.cmd('echo "Installing `mini.nvim`" | redraw')
+	local clone_cmd = {
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/echasnovski/mini.nvim",
+		mini_path,
+	}
+	vim.fn.system(clone_cmd)
+	vim.cmd("packadd mini.nvim | helptags ALL")
+	vim.cmd('echo "Installed `mini.nvim`" | redraw')
 end
 
-require("mini.deps").setup({ path = { package = path_package } })
-
---
--- Helper functions
---
-local function nix_or(a, b)
-	if vim.g.is_nix then
-		return a
-	else
-		return b
-	end
+---
+--- Helpers
+---
+local function keymap(mode, lhs, rhs, desc)
+	vim.keymap.set(mode, lhs, rhs, { desc = desc })
 end
 
-local function add(spec, opts)
-	if not vim.g.is_nix then
-		MiniDeps.add(spec, opts)
-	end
+local function setup(modname, opts)
+	require(modname).setup(opts)
 end
 
--- NOTE: Generally: now => used to draw the initial screen, later => otherwise
-local now, later = MiniDeps.now, MiniDeps.later
+setup("mini.deps")
+local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
---
--- Options
---
+---
+--- Options
+---
 now(function()
-	vim.opt.breakindent = true
-	vim.opt.linebreak = true
+	-- Executed now to show correct appearance on startup
+	vim.o.breakindent = true
+	vim.o.linebreak = true
 
-	vim.opt.cursorcolumn = true
-	vim.opt.cursorline = true
+	vim.o.cursorcolumn = true
+	vim.o.cursorline = true
 
-	vim.opt.ignorecase = true
-	vim.opt.smartcase = true
+	vim.o.ignorecase = true
+	vim.o.smartcase = true
 
-	vim.opt.list = true
-	vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+	vim.o.list = true
+	vim.o.listchars = "tab:» ,trail:·,nbsp:␣"
 
-	vim.opt.number = true
-	vim.opt.relativenumber = true
+	vim.o.splitbelow = true
+	vim.o.splitright = true
 
-	vim.opt.splitbelow = true
-	vim.opt.splitright = true
+	vim.o.inccommand = "split"
+	vim.o.mouse = "a"
+	vim.o.number = true
+	vim.o.scrolloff = 3
+	vim.o.showmode = false
+	vim.o.undofile = true
 
-	vim.opt.inccommand = "split"
-	vim.opt.mouse = "a"
-	vim.opt.scrolloff = 10
-	vim.opt.showmode = false
-	vim.opt.undofile = true
+	vim.diagnostic.config({ virtual_text = true })
 end)
 
--- NOTE: Do this later as it can increase startup time
+---
+--- Keymaps
+---
 later(function()
-	vim.opt.clipboard = "unnamedplus"
+	keymap("i", "jk", "<ESC>", "Exit insert mode")
+
+	keymap("n", "j", "gj", "Move down within a wrapped line")
+	keymap("n", "k", "gk", "Move up within a wrapped line")
+
+	keymap("n", "<ESC>", "<Cmd>nohlsearch<CR>", "Clear search highlight")
+	keymap("n", "<Leader>q", vim.diagnostic.setloclist, "Open diagnostic [Q)uickfix list")
+	keymap("t", "<ESC><ESC>", "<C-\\><C-n>", "Exit terminal mode")
+
+	keymap("n", "<C-h>", "<C-w><C-h>", "Move focus to the left window")
+	keymap("n", "<C-l>", "<C-w><C-l>", "Move focus to the right window")
+	keymap("n", "<C-j>", "<C-w><C-j>", "Move focus to the lower window")
+	keymap("n", "<C-k>", "<C-w><C-k>", "Move focus to the upper window")
+
+	keymap("n", "<Leader>y", '"+y', "Copy to system clipboard")
+	keymap("n", "<Leader>p", '"+p', "Paste from system clipboard")
 end)
 
---
--- General keymaps
---
+---
+--- Autocommands
+---
 later(function()
-	vim.keymap.set("i", "jk", "<Esc>", { desc = "Exit insert mode" })
-
-	vim.keymap.set("n", "j", "gj", { desc = "Move down within a wrapped line" })
-	vim.keymap.set("n", "k", "gk", { desc = "Move up within a wrapped line" })
-
-	vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>", { desc = "Clear search Highlight" })
-
-	vim.keymap.set("n", "<Leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
-
-	vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-
-	vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-	vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-	vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-	vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-
 	vim.api.nvim_create_autocmd("TextYankPost", {
-		desc = "Highlight when yanking (copying) text",
+		desc = "Highlight when yanking text",
 		group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
 		callback = function()
 			vim.highlight.on_yank()
@@ -114,142 +102,71 @@ later(function()
 	})
 end)
 
---
--- Display plugins
---
+---
+--- Appearance Plugins
+---
 now(function()
+	-- Executed now to show correct appearance on startup
 	add("catppuccin/nvim")
-	vim.cmd.colorscheme("catppuccin-macchiato")
+	vim.cmd.colorscheme("catppuccin-mocha")
 
-	require("mini.notify").setup()
+	setup("mini.notify")
 	vim.notify = require("mini.notify").make_notify()
 
-	require("mini.icons").setup({ style = "ascii" })
-	require("mini.indentscope").setup({
+	setup("mini.cursorword")
+	setup("mini.icons")
+	setup("mini.statusline")
+
+	setup("mini.indentscope", {
 		draw = { animation = require("mini.indentscope").gen_animation.none() },
-		options = { indent_at_cursor = false },
+		options = { try_as_border = true },
 	})
-	-- ERROR: Why can't I use true for statusline w/ ascii icons? It causes weird symbols
-	require("mini.statusline").setup({ use_icons = false })
 
 	add("tpope/vim-sleuth")
+
+	add("mawkler/hml.nvim")
+	setup("hml")
+
+	add("cksidharthan/mentor.nvim")
+	setup("mentor")
 end)
 
---
--- Functional plugins
---
+---
+--- Text Editing Plugins
+---
+
+-- General
 later(function()
-	require("mini.ai").setup()
-	require("mini.comment").setup()
-	require("mini.completion").setup()
-	require("mini.cursorword").setup()
-	-- TODO: Setup diff and git
-	require("mini.diff").setup()
-	require("mini.extra").setup()
-	require("mini.git").setup()
-	require("mini.pairs").setup()
-	require("mini.surround").setup()
+	setup("mini.ai")
+	setup("mini.comment")
+	setup("mini.completion")
+	setup("mini.extra")
+	setup("mini.misc")
+	setup("mini.surround")
 end)
 
+-- Formatter
 later(function()
-	local miniclue = require("mini.clue")
-	miniclue.setup({
-		triggers = {
-			-- Leader triggers
-			{ mode = "n", keys = "<Leader>" },
-			{ mode = "x", keys = "<Leader>" },
-
-			-- Built-in completion
-			{ mode = "i", keys = "<C-x>" },
-
-			-- `g` key
-			{ mode = "n", keys = "g" },
-			{ mode = "x", keys = "g" },
-
-			-- Marks
-			{ mode = "n", keys = "'" },
-			{ mode = "n", keys = "`" },
-			{ mode = "x", keys = "'" },
-			{ mode = "x", keys = "`" },
-
-			-- Registers
-			{ mode = "n", keys = '"' },
-			{ mode = "x", keys = '"' },
-			{ mode = "i", keys = "<C-r>" },
-			{ mode = "c", keys = "<C-r>" },
-
-			-- Window commands
-			{ mode = "n", keys = "<C-w>" },
-
-			-- `z` key
-			{ mode = "n", keys = "z" },
-			{ mode = "x", keys = "z" },
-			{ mode = "n", keys = "d" },
+	add("stevearc/conform.nvim")
+	setup("conform", {
+		formatters_by_ft = {
+			lua = { "stylua" },
+			nix = { "nixfmt" },
+			python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
+			rust = { "rustfmt" },
+			fennel = { "fnlfmt" },
 		},
-
-		clues = {
-			-- TODO: Remove unused clue groups
-			{ mode = "n", keys = "<Leader>c", desc = "[C]ode" },
-			{ mode = "x", keys = "<Leader>c", desc = "[C]ode" },
-			{ mode = "n", keys = "<Leader>d", desc = "[D]ocument" },
-			{ mode = "n", keys = "<Leader>h", desc = "Git [H]unk" },
-			{ mode = "v", keys = "<Leader>h", desc = "Git [H]unk" },
-			{ mode = "n", keys = "<Leader>r", desc = "[R]ename" },
-			{ mode = "n", keys = "<Leader>s", desc = "[S]earch" },
-			{ mode = "n", keys = "<Leader>t", desc = "[T]oggle" },
-			{ mode = "n", keys = "<Leader>w", desc = "[W]orkspace" },
-
-			miniclue.gen_clues.builtin_completion(),
-			miniclue.gen_clues.g(),
-			miniclue.gen_clues.marks(),
-			miniclue.gen_clues.registers(),
-			miniclue.gen_clues.windows(),
-			miniclue.gen_clues.z(),
-		},
+		format_on_save = { lsp_format = "fallback" },
 	})
 end)
 
+-- Hardtime
 later(function()
-	require("mini.files").setup()
-	vim.keymap.set("n", "\\", MiniFiles.open, { desc = "Open file navigator" })
+	add("m4xshen/hardtime.nvim")
+	setup("hardtime")
 end)
 
-later(function()
-	require("mini.pick").setup()
-	local mp = MiniPick.builtin
-	local me = MiniExtra.pickers
-
-	vim.keymap.set("n", "<Leader>/", me.buf_lines, { desc = "Search [/] Fuzzily in current buffer" })
-	vim.keymap.set("n", "<Leader><Leader>", mp.buffers, { desc = "[ ] Find existing buffers" })
-	vim.keymap.set("n", "<Leader>sd", me.diagnostic, { desc = "[S]earch [D]iagnostics" })
-	vim.keymap.set("n", "<Leader>sf", mp.files, { desc = "[S]earch [F]iles" })
-	vim.keymap.set("n", "<Leader>sg", mp.grep_live, { desc = "[S]earch by [G]rep" })
-	vim.keymap.set("n", "<Leader>sh", mp.help, { desc = "[S]earch [H]elp" })
-	vim.keymap.set("n", "<Leader>sk", me.keymaps, { desc = "[S]earch [K]eymaps" })
-	vim.keymap.set("n", "<Leader>so", me.oldfiles, { desc = "[S]earch [O]ldfiles" })
-	vim.keymap.set("n", "<Leader>sr", mp.resume, { desc = "[S]earch [R]esume" })
-	vim.keymap.set("n", "<Leader>sw", function()
-		mp.grep({ pattern = vim.fn.expand("<cword>") })
-	end, { desc = "[S]earch [W]ord" })
-end)
-
--- later(function()
--- 	add("stevearc/conform.nvim")
--- 	require("conform").setup({
--- 		formatters_by_ft = {
--- 			c = { "clang-format" },
--- 			cpp = { "clang-format" },
--- 			lua = { "stylua" },
--- 			nix = { "nixfmt" },
--- 			python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
--- 			rust = { "rustfmt" },
--- 		},
--- 		format_on_save = {
--- 			lsp_format = "fallback",
--- 		},
--- 	})
--- end)
-
+-- Linter
 later(function()
 	add("mfussenegger/nvim-lint")
 	require("lint").linters_by_ft = {
@@ -258,7 +175,9 @@ later(function()
 		nix = { "nix" },
 		python = { "ruff" },
 		rust = { "clippy" },
+		fennel = { "fennel" },
 	}
+
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		desc = "Run lint after Buffer write",
 		group = vim.api.nvim_create_augroup("lint", { clear = true }),
@@ -268,48 +187,29 @@ later(function()
 	})
 end)
 
--- NOTE: Load right away so that lsp client can attach when starting nvim with a file
+-- LSP
 now(function()
-	-- add("folke/lazydev.nvim")
-	-- require("lazydev").setup({
-	-- 	library = { "${3rd}/luv/library" },
-	-- })
+	-- Executed now to load lsp when starting neovim with a file
+	add("folke/lazydev.nvim")
+	setup("lazydev", {
+		library = { "${3rd}/luv/library" },
+	})
 
 	add("neovim/nvim-lspconfig")
 	require("lspconfig").rust_analyzer.setup({})
 	require("lspconfig").lua_ls.setup({})
+	require("lspconfig").ruff.setup({})
 
 	vim.api.nvim_create_autocmd("LspAttach", {
 		desc = "Setup lsp on attach",
 		group = vim.api.nvim_create_augroup("lsp", { clear = true }),
-		callback = function(event)
-			local keymaplsp = function(mode, key, func, desc)
-				vim.keymap.set(mode, key, func, { buffer = event.buf, desc = "[L]SP: " .. desc })
-			end
-
-			keymaplsp("n", "<Leader>rn", vim.lsp.buf.rename, "[R]e[N]ame")
-			keymaplsp("n", "<Leader>ca", vim.lsp.buf.code_action, "[C]ode [A]cton")
-			keymaplsp("n", "<Leader>gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
-			keymaplsp("n", "<Leader>D", "<Cmd>Pick lsp scope='type_definition'<CR>", "Type [D]efinition")
-			keymaplsp("n", "<Leader>ds", "<Cmd>Pick lsp scope='document_symbol'<CR>", "[D]ocument [S]ymbols")
-			keymaplsp("n", "<Leader>ws", "<Cmd>Pick lsp scope='workspace_symbol'<CR>", "[W]orkspace [S]ymbols")
-
-			keymaplsp("n", "gD", "<Cmd>Pick lsp scope='declaration'<CR>", "[G]oto [D]eclaration")
-			keymaplsp("n", "gI", "<Cmd>Pick lsp scope='implementation'<CR>", "[G]oto [I]mplementation")
-			keymaplsp("n", "gd", "<Cmd>Pick lsp scope='definition'<CR>", "[G]oto [D]efinition")
-			keymaplsp("n", "gr", "<Cmd>Pick lsp scope='references'<CR>", "[G]oto [R]eferences")
-
-			local client = vim.lsp.get_client_by_id(event.data.client_id)
-			if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-				keymaplsp("n", "<Leader>th", function()
-					vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-				end, "[T]oggle Inlay [H]ints")
-			end
+		callback = function()
+			print("TODO")
 		end,
 	})
 end)
 
+-- Treesitter
 later(function()
 	add({
 		source = "nvim-treesitter/nvim-treesitter",
@@ -319,12 +219,88 @@ later(function()
 			end,
 		},
 	})
-	---@diagnostic disable-next-line: missing-fields
-	require("nvim-treesitter.configs").setup({
-		ensure_installed = nix_or(nil, { "c", "cpp", "lua", "nix", "python", "rust", "vimdoc" }),
+
+	setup("nvim-treesitter.configs", {
+		ensure_installed = {
+			"bash",
+			"c",
+			"cpp",
+			"diff",
+			"fennel",
+			"git_config",
+			"git_rebase",
+			"gitattributes",
+			"gitcommit",
+			"gitignore",
+			"haskell",
+			"json",
+			"lua",
+			"make",
+			"nix",
+			"python",
+			"rust",
+			"toml",
+			"vim",
+			"vimdoc",
+		},
 		highlight = { enable = true },
 		indent = { enable = true },
 	})
+end)
+
+now(function()
+	-- Executed now to load parinfer when starting neovim with a file
+	add("gpanders/nvim-parinfer")
+end)
+---
+--- Workflow Plugins
+---
+
+-- File manager
+later(function()
+	setup("mini.files")
+	keymap("n", "\\", MiniFiles.open, "Open file navigator")
+end)
+
+-- Keybinding hints
+later(function()
+	add("folke/which-key.nvim")
+	require("which-key")
+end)
+
+-- Mason
+later(function()
+	add("mason-org/mason.nvim")
+	setup("mason")
+
+	add("WhoIsSethDaniel/mason-tool-installer.nvim")
+	setup("mason-tool-installer", {
+		ensure_installed = {
+			"stylua",
+			"lua-language-server",
+			"ruff",
+		},
+	})
+end)
+
+-- Picker
+later(function()
+	setup("mini.pick")
+	local mp = MiniPick.builtin
+	local me = MiniExtra.pickers
+
+	keymap("n", "<Leader>/", me.buf_lines, "[/] Search fuzzily in current buffer")
+	keymap("n", "<Leader><Leader>", mp.buffers, "[ ] Search existing buffers")
+	keymap("n", "<Leader>sd", me.diagnostic, "[S]earch [D]iagnostics")
+	keymap("n", "<Leader>sf", mp.files, "[S]earch [F]iles")
+	keymap("n", "<Leader>sg", mp.grep_live, "[S]earch by [G]rep")
+	keymap("n", "<Leader>sh", mp.help, "[S]earch [H]elp")
+	keymap("n", "<Leader>sk", me.keymaps, "[S]earch [K]eymaps")
+	keymap("n", "<Leader>so", me.oldfiles, "[S]earch [O]ldfiles")
+	keymap("n", "<Leader>sr", mp.resume, "[S]earch [R]esume")
+	keymap("n", "<Leader>sw", function()
+		mp.grep({ pattern = vim.fn.expand("<cword>") })
+	end, "[S]earch [W]ord")
 end)
 
 -- vim: ts=2 sts=2 sw=2
