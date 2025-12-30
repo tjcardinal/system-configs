@@ -122,9 +122,6 @@ later(function()
 
 	add("folke/which-key.nvim")
 	require("which-key")
-
-	add("mason-org/mason.nvim")
-	setup("mason")
 end)
 
 --- Picker
@@ -150,6 +147,12 @@ later(function()
 	end, "[S]earch [W]ord")
 end)
 
+--- Mason. Executed now to set tool paths needed on startup
+now(function()
+	add("mason-org/mason.nvim")
+	setup("mason")
+end)
+
 --- LSP. Executed now to load lsp when starting neovim with a file
 now(function()
 	add("folke/lazydev.nvim")
@@ -158,6 +161,7 @@ now(function()
 	})
 
 	add("neovim/nvim-lspconfig")
+	vim.lsp.enable("basedpyright")
 	vim.lsp.enable("ruff")
 	vim.lsp.enable("rust_analyzer")
 	vim.lsp.enable("lua_ls")
@@ -223,6 +227,7 @@ later(function()
 		formatters_by_ft = {
 			lua = { "stylua" },
 			nix = { "nixfmt" },
+			python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 			rust = { "rustfmt" },
 			fennel = { "fnlfmt" },
 		},
