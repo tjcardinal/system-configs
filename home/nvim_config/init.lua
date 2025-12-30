@@ -249,7 +249,4 @@ later(function()
 	})
 end)
 
---- Mason
-later(function() end)
-
 -- vim: ts=2 sts=2 sw=2
