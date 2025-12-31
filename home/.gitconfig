@@ -1,3 +1,5 @@
 [user]
 	name = Tyler Cardinal
 	email = 83625450+tjcardinal@users.noreply.github.com
+[credential]
+	helper = store
