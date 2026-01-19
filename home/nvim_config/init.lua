@@ -171,6 +171,8 @@ now(function()
 		group = vim.api.nvim_create_augroup("lsp", { clear = true }),
 		callback = function()
 			print("TODO: LSP specific keybinds, capabilities, ...")
+			keymap("n", "gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
+			keymap("n", "gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 		end,
 	})
 end)
