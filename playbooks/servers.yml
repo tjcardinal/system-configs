@@ -1,0 +1,2 @@
+- import_playbook: atlas.yml
+- import_playbook: solomon.yml

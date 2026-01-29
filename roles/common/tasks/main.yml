@@ -1,0 +1,22 @@
+- name: Install Software
+  become: yes
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - bat
+      - fd-find
+      - fish
+      - fzf
+      - htop
+      - neovim
+      - ripgrep
+      - tealdeer
+      - tmux
+      - zoxide
+
+- name: Add Fish to .bashrc
+  ansible.builtin.lineinfile:
+    path: "~/.bashrc"
+    state: present
+    line: "exec fish"

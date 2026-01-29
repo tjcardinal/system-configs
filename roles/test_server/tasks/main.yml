@@ -1,0 +1,20 @@
+- name: Copy Docker Compose File
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/docker-compose.yml"
+    dest: "~/docker"
+
+- name: Add TS_AUTHKEY to .env
+  ansible.builtin.copy:
+    content: "TS_AUTHKEY={{ wyse5070_ts_authkey }}"
+    dest: "~/docker/.env"
+
+- name: Create and Start Services
+  become: yes
+  community.docker.docker_compose_v2:
+    project_src: "/home/tcardinal/docker"
+    pull: always
+  register: output
+
+- name: Show Results
+  ansible.builtin.debug:
+    var: output

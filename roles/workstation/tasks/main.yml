@@ -1,0 +1,36 @@
+- name: Install Software
+  become: yes
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - build-essential
+      - distrobox
+      - git
+
+- name: Symlink Dotfiles
+  ansible.builtin.file: 
+    src: "{{ dotfiles_dir }}/{{ item | basename }}"
+    dest: "~/{{ item | basename}}"
+    state: link
+    force: yes
+  with_fileglob: "{{ dotfiles_dir }}/.*"
+
+- name: Ensure ~/.config Exists
+  ansible.builtin.file:
+    path: "~/.config"
+    state: directory
+
+- name: Symlink Neovim Config
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/nvim_config"
+    dest: "~/.config/nvim"
+    state: link
+    force: yes
+
+- name: Symlink Fish Config
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/fish_config"
+    dest: "~/.config/fish"
+    state: link
+    force: yes

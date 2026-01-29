@@ -1,0 +1,20 @@
+- name: Copy Dotfiles
+  ansible.builtin.copy: 
+    src: "{{ dotfiles_dir }}/{{ item | basename }}"
+    dest: "~/{{ item | basename}}"
+  with_fileglob: "{{ dotfiles_dir }}/.*"
+
+- name: Ensure ~/.config Exists
+  ansible.builtin.file:
+    path: "~/.config"
+    state: directory
+
+- name: Copy Neovim Config
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/nvim_config"
+    dest: "~/.config/nvim"
+
+- name: Copy Fish Config
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dir }}/fish_config"
+    dest: "~/.config/fish"

@@ -1,0 +1,15 @@
+- name: Copy Docker Compose File
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/docker-compose.yml"
+    dest: "~/docker"
+
+- name: Create and Start Services
+  become: yes
+  community.docker.docker_compose_v2:
+    project_src: "/home/tcardinal/docker"
+    pull: always
+  register: output
+
+- name: Show Results
+  ansible.builtin.debug:
+    var: output

@@ -1,0 +1,5 @@
+- name: Configure Heinrich as a Workstation
+  hosts: heinrich
+  roles:
+    - common
+    - workstation

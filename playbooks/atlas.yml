@@ -1,0 +1,6 @@
+- name: Configure Atlas as a Media Server
+  hosts: atlas
+  roles:
+    - common
+    - server
+    - media_server

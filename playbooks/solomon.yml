@@ -1,0 +1,6 @@
+- name: Configure Solomon as a Test Server
+  hosts: solomon
+  roles:
+    - common
+    - server
+    - test_server
