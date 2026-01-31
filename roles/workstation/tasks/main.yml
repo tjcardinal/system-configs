@@ -5,7 +5,7 @@
     cache_valid_time: 3600
     name:
       - build-essential
-      - distrobox
+      # - distrobox
       - git
 
 - name: Symlink Dotfiles
