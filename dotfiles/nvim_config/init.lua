@@ -114,7 +114,6 @@ later(function()
 	setup("mini.comment")
 	setup("mini.completion")
 	setup("mini.extra")
-	setup("mini.jump2d")
 	setup("mini.surround")
 
 	setup("mini.files")
@@ -125,11 +124,13 @@ later(function()
 
 	add("m4xshen/hardtime.nvim")
 	setup("hardtime", {
+		restricted_keys = {
+			["j"] = false,
+			["k"] = false,
+		},
 		disable_mouse = false,
 		restriction_mode = "hint",
 	})
-
-	add("szymonwilczek/vim-be-better")
 end)
 
 --- Picker
@@ -169,10 +170,17 @@ now(function()
 	})
 
 	add("neovim/nvim-lspconfig")
-	vim.lsp.enable("basedpyright")
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("rust_analyzer")
-	vim.lsp.enable("lua_ls")
+	vim.lsp.enable({
+		"basedpyright",
+		"fennel_ls",
+		"gleam",
+		"gopls",
+		"janet_lsp",
+		"lua_ls",
+		"ruff",
+		"rust_analyzer",
+		"ty",
+	})
 
 	vim.api.nvim_create_autocmd("LspAttach", {
 		desc = "Setup lsp on attach",
@@ -183,6 +191,14 @@ now(function()
 		end,
 	})
 end)
+
+---
+---
+---
+--- NEED TO REVIEW THINGS BELOW. TRY AND MINIMIZE
+---
+---
+---
 
 --- Treesitter
 later(function()
@@ -222,12 +238,6 @@ later(function()
 		indent = { enable = true },
 	})
 end)
-
----
----
---- NEED TO REVIEW THINGS BELOW. TRY AND MINIMIZE
----
----
 
 --- Formatter
 later(function()
