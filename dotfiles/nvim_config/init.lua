@@ -223,6 +223,8 @@ later(function()
 			"gitattributes",
 			"gitcommit",
 			"gitignore",
+			"gleam",
+			"go",
 			"haskell",
 			"json",
 			"lua",
