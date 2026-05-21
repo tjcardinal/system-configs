@@ -1,5 +1,5 @@
 - name: Configure tyler-desktop as a Gaming Workstation
-  hosts: tyler-desktop
+  hosts: tyler_desktop
   roles:
     - common
     - workstation
