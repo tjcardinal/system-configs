@@ -1,6 +1,5 @@
-- name: Configure Solomon as a Test Server
+- name: Configure Solomon as a Server
   hosts: solomon
   roles:
     - common
     - server
-    - test_server

@@ -1,6 +1,7 @@
-- name: Configure Atlas as a Media Server
+- name: Configure Atlas as a Home Server
   hosts: atlas
   roles:
     - common
     - server
     - media_server
+    - tailscale

@@ -1,0 +1,5 @@
+- name: Configure Nate as a Server
+  hosts: nate
+  roles:
+    - common
+    - server

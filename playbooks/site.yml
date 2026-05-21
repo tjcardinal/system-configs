@@ -1,2 +1,6 @@
-- import_playbook: workstation.yml
-- import_playbook: servers.yml
+- import_playbook: atlas.yml
+- import_playbook: heinrich.yml
+- import_playbook: htpc.yml
+- import_playbook: nate.yml
+- import_playbook: solomon.yml
+- import_playbook: tyler_desktop.yml
