@@ -5,8 +5,17 @@
     cache_valid_time: 3600
     name:
       - build-essential
-      # - distrobox
+      - distrobox
+      - fish
+      - fzf
       - git
+      - neovim
+
+- name: Add Fish to .bashrc
+  ansible.builtin.lineinfile:
+    path: "~/.bashrc"
+    state: present
+    line: "exec fish"
 
 - name: Symlink Dotfiles
   ansible.builtin.file: 
