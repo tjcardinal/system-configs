@@ -1,4 +1,7 @@
 services:
+  #
+  # Access
+  #
   homepage:
     container_name: homepage
     image: nginx:latest
@@ -30,6 +33,9 @@ services:
     labels:
       - "nautical.enable=false"
 
+  #
+  # Backup
+  #
   nautical:
     container_name: nautical
     image: minituff/nautical-backup:latest
@@ -47,15 +53,9 @@ services:
     labels:
       - "nautical.enable=false"
 
-  syncthing:
-    container_name: syncthing
-    image: syncthing/syncthing
-    restart: unless-stopped
-    volumes:
-      - /docker/syncthing:/var/syncthing
-    network_mode: host
-
-# Media
+  #
+  # Movie/Show Stack
+  #
   jellyfin:
     container_name: jellyfin
     image: jellyfin/jellyfin:latest
@@ -99,23 +99,9 @@ services:
       - /docker/sonarr:/config
       - /mnt/disk2/data:/data
 
-  sabnzbd:
-    container_name: sabnzbd
-    image: ghcr.io/hotio/sabnzbd:latest
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=America/Chicago
-      - WEBUI_PORTS=8080/tcp,8080/udp
-      - ARGS
-    volumes:
-      - /docker/sabnzbd:/config
-      - /mnt/disk2/data/usenet:/data/usenet
-
+  #
+  # Other Media
+  #
   audiobookshelf:
     container_name: audiobookshelf
     image: ghcr.io/advplyr/audiobookshelf:latest
@@ -131,6 +117,19 @@ services:
       - /mnt/disk2/data/podcasts:/podcasts
     user: 1000:1000
 
+  navidrome:
+    container_name: navidrome
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    ports:
+      - 4533:4533
+    volumes:
+      - /docker/navidrome:/data
+      - /mnt/disk2/data/music:/music:ro
+
+  #
+  # RSS
+  #
   miniflux:
     container_name: miniflux
     image: miniflux/miniflux:latest
@@ -168,6 +167,9 @@ services:
       interval: 10s
       start_period: 30s
 
+  #
+  # Syncing
+  # 
   anki-sync-server:
     container_name: anki-sync-server
     image: chrislongros/anki-sync-server-enhanced:latest
@@ -182,5 +184,30 @@ services:
     volumes:
       - /docker/anki-sync-server:/data
 
-# todo add:
-# bookmark manager???
+  syncthing:
+    container_name: syncthing
+    image: syncthing/syncthing
+    restart: unless-stopped
+    volumes:
+      - /docker/syncthing:/var/syncthing
+    network_mode: host
+
+  #
+  # Usenet
+  #
+  sabnzbd:
+    container_name: sabnzbd
+    image: ghcr.io/hotio/sabnzbd:latest
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/Chicago
+      - WEBUI_PORTS=8080/tcp,8080/udp
+      - ARGS
+    volumes:
+      - /docker/sabnzbd:/config
+      - /mnt/disk2/data/usenet:/data/usenet

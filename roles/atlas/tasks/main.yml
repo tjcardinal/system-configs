@@ -6,28 +6,19 @@
     group: 1000
     owner: 1000
 
-# - name: Ensure /docker/<role> Exists
-#   become: yes
-#   ansible.builtin.file:
-#     path: "/docker/{{ role_name }}"
-#     state: directory
-
 - name: Copy Files
   ansible.builtin.copy:
     src: "{{ role_path }}/files/"
-    # dest: "/docker/{{ role_name }}/"
     dest: "/docker/"
 
 - name: Add TS_AUTHKEY to .env
   ansible.builtin.copy:
     content: "TS_AUTHKEY={{ ts_authkey }}"
-    # dest: "/docker/{{ role_name }}/.env"
     dest: "/docker/.env"
 
 - name: Create and Start Services
   become: yes
   community.docker.docker_compose_v2:
-    # project_src: "/docker/{{ role_name }}"
     project_src: "/docker"
     pull: always
   register: output

@@ -6,7 +6,15 @@
     name:
       - build-essential
       - distrobox
+      - fish
+      - fzf
       - git
+
+- name: Add Fish to .bashrc
+  ansible.builtin.lineinfile:
+    path: "~/.bashrc"
+    state: present
+    line: "exec fish"
 
 - name: Symlink Dotfiles
   ansible.builtin.file: 
