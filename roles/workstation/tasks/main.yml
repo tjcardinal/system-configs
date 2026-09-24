@@ -10,16 +10,10 @@
       - fzf
       - git
 
-- name: Add Fish to .bashrc
-  ansible.builtin.lineinfile:
-    path: "~/.bashrc"
-    state: present
-    line: "exec fish"
-
 - name: Symlink Dotfiles
   ansible.builtin.file: 
     src: "{{ dotfiles_dir }}/{{ item | basename }}"
-    dest: "~/{{ item | basename}}"
+    dest: "~/{{ item | basename }}"
     state: link
     force: yes
   with_fileglob: "{{ dotfiles_dir }}/.*"
@@ -29,16 +23,22 @@
     path: "~/.config"
     state: directory
 
-- name: Symlink Neovim Config
+- name: Symlink Neovim Directory
   ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/nvim_config"
+    src: "{{ dotfiles_dir }}/.config/nvim"
     dest: "~/.config/nvim"
     state: link
     force: yes
 
-- name: Symlink Fish Config
+- name: Symlink Fish Directory
   ansible.builtin.file:
-    src: "{{ dotfiles_dir }}/fish_config"
+    src: "{{ dotfiles_dir }}/.config/fish"
     dest: "~/.config/fish"
     state: link
     force: yes
+
+- name: Add Fish to .bashrc
+  ansible.builtin.lineinfile:
+    path: "~/.bashrc"
+    state: present
+    line: "exec fish"

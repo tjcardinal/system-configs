@@ -2,4 +2,3 @@
   hosts: nate
   roles:
     - common
-    - server

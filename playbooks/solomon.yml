@@ -2,4 +2,3 @@
   hosts: solomon
   roles:
     - common
-    - server

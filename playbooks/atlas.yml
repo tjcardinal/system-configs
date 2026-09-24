@@ -2,5 +2,4 @@
   hosts: atlas
   roles:
     - common
-    - server
     - atlas
