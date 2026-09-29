@@ -11,7 +11,7 @@ services:
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
     labels:
-      - "nautical.enable=false"
+      - "nautical-backup.enable=false"
 
   tailscale:
     container_name: tailscale
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env # TS_AUTHKEY
     labels:
-      - "nautical.enable=false"
+      - "nautical-backup.enable=false"
 
   #
   # Backup
@@ -51,7 +51,7 @@ services:
       - /docker:/app/source
       - /mnt/disk1/backups:/app/destination
     labels:
-      - "nautical.enable=false"
+      - "nautical-backup.enable=false"
 
   #
   # Movie/Show Stack
@@ -127,6 +127,21 @@ services:
       - /docker/navidrome:/data
       - /mnt/disk2/data/music:/music:ro
 
+  musicgrabber:
+    container_name: musicgrabber
+    image: g33kphr33k/musicgrabber:latest
+    restart: unless-stopped
+    ports:
+      - 38274:8080
+    volumes:
+      - /docker/musicgrabber:/data
+      - /mnt/disk2/data/music:/music
+    shm_size: 2gb
+    environment:
+      - MUSIC_DIR=/music
+      - DB_PATH=/data/music_grabber.db
+      - ENABLE_MUSICBRAINZ=true
+
   #
   # RSS
   #
@@ -150,7 +165,7 @@ services:
       miniflux-db:
         condition: service_healthy
     labels:
-      - "nautical.enable=false"
+      - "nautical-backup.enable=false"
 
   miniflux-db:
     container_name: miniflux-db
